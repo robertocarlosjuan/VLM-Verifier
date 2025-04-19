@@ -25,8 +25,8 @@ inference_model:
   plan_strategy:
     _target_: inference.plan.VimaPlan
   verifier_strategy:
-    _target_: inference.verifier.TwoStepVerification    
+    _target_: inference.verifier.BinaryTwoStepVerification    
 
 state_1_image_path: /home/hice1/che321/scratch/VLM/vima-perturb-cleaned/images/state_s1_6.png
 state_2_image_path: /home/hice1/che321/scratch/VLM/vima-perturb-cleaned/images/state_s2_6.png
-max_perturb_steps: 1
+max_perturb_steps: 6

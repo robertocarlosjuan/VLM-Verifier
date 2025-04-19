@@ -49,9 +49,22 @@ class InterleavedImageVerification:
 class TwoStepVerification:
 
     def __init__(self):
+        self.expected_output_template = "You are highly skilled in robotic task planning. The image shows the initial state. Given the task plan\n{}\nThe robot has just completed step {}.\nDescribe the expected observation."
+        self.verifier_template = "You are highly skilled in robotic task verification. Given the expected observation {}, identify if the current observation is expected. Provide your answer in one word 'success', 'partial success', 'partial failure' or 'failure'."
+
+    def verify(self, model, initial_image_path, current_image_path, task_plan, current_step):
+        expected_output_prompt = self.expected_output_template.format(task_plan, current_step)
+        expected_output = model.run([initial_image_path, expected_output_prompt])
+        verifier_prompt = self.verifier_template.format(expected_output)
+        verifier_result = model.run([current_image_path, verifier_prompt])
+        return verifier_result
+
+class TwoStepVerificationEdited:
+
+    def __init__(self):
         self.expected_output_template = "You are highly skilled in robotic task planning. The image shows the initial state. Given the task plan\n{}\nThe robot has just completed step {}.\nAssume the camera perspective is fixed. Give a description of the expected visual observation that would confirm the successful completion of this step. When the object description can refer to multiple objects equally, list the descriptions of the various possible expected observations. Do not reference prior object positions or actions."
         # "You are highly skilled in robotic task verification. Given the expected observation {}, identify if the current observation is expected. Provide your answer in one word 'success' or 'failure'."
-        self.verifier_template = "You are an expert at verifying whether the spatial arrangement of objects in an image matches a given scene description. You are provided with an image and descriptions of object positions in a scene:\n{}\nExamine the image and determine if it matches any of the descriptions. As long as one description matches the scene, it should be considered a success. Focus only on the spatial relationships between objects involved. Provide your answer in one word 'success', 'partial success', 'partial failure' or 'failure'."
+        self.verifier_template = "You are an expert at verifying whether the spatial arrangement of objects in an image matches a given scene description. You are provided with an image and descriptions of object positions in a scene:\n{}\nExamine the image and determine if it matches any of the descriptions. As long as one description matches the scene, it should be considered a success. Focus only on the spatial relationships between objects involved. Provide your answer in one word 'success' or 'failure'."
 
     def verify(self, model, initial_image_path, current_image_path, task_plan, current_step):
         expected_output_prompt = self.expected_output_template.format(task_plan, current_step)
