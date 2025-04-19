@@ -38,7 +38,7 @@ class TwoImageVerification:
 class InterleavedImageVerification:
 
     def __init__(self):
-        self.verifier_template = "You are highly skilled in robotic task verification. Given initial observation, current observation and the task plan\n{}\nIdentify if the step has been successfully executed. Provide your answer in one word 'success', 'partial success', 'partial failure' or 'failure'."
+        self.verifier_template = "You are highly skilled in robotic task verification. Given initial observation, current observation and the task plan\n{}\nIdentify if the step has been successfully executed. Provide your answer in one word 'success', 'partial success', 'partial failure' or 'failure'. explain why"
 
     def verify(self, model, initial_image_path, current_image_path, task_plan, current_step):
         curr_task_plans = "\n".join(task_plan.split("\n")[:current_step])
@@ -49,8 +49,9 @@ class InterleavedImageVerification:
 class TwoStepVerification:
 
     def __init__(self):
-        self.expected_output_template = "You are highly skilled in robotic task planning. The image shows the initial state. Given the task plan\n{}\nThe robot has just completed step {}.\nDescribe the expected observation."
-        self.verifier_template = "You are highly skilled in robotic task verification. Given the expected observation {}, identify if the current observation is expected. Provide your answer in one word 'success', 'partial success', 'partial failure' or 'failure'. explain why"
+        self.expected_output_template = "You are highly skilled in robotic task planning. The image shows the initial state. Given the task plan\n{}\nThe robot has just completed step {}.\nAssume the camera perspective is fixed. Give a description of the expected visual observation that would confirm the successful completion of this step. When the object description can refer to multiple objects equally, list the descriptions of the various possible expected observations. Do not reference prior object positions or actions."
+        # "You are highly skilled in robotic task verification. Given the expected observation {}, identify if the current observation is expected. Provide your answer in one word 'success' or 'failure'."
+        self.verifier_template = "You are an expert at verifying whether the spatial arrangement of objects in an image matches a given scene description. You are provided with an image and descriptions of object positions in a scene:\n{}\nExamine the image and determine if it matches any of the descriptions. As long as one description matches the scene, it should be considered a success. Focus only on the spatial relationships between objects involved. Provide your answer in one word 'success', 'partial success', 'partial failure' or 'failure'."
 
     def verify(self, model, initial_image_path, current_image_path, task_plan, current_step):
         expected_output_prompt = self.expected_output_template.format(task_plan, current_step)

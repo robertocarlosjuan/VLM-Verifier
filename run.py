@@ -57,7 +57,10 @@ def get_pick_place_prompts(env, task):
     return prompt
 
 def get_action_steps(action_outputs):
-    return action_outputs.split('\n')
+    lines = action_outputs.split('\n')
+    # if line starts with a number, it is an action step. a number and a dot is an action step.
+    action_steps = [line for line in lines if re.match(r'^\d+', line)]
+    return action_steps
 
 def move_to_next_action_steps(action_outputs):
     return ' '.join(get_action_steps(action_outputs)[2:])
@@ -94,6 +97,8 @@ object_id2coords=None
 
 @hydra.main(config_path=".", config_name="conf")
 def main(cfg):
+
+    print(cfg)
     
     kwargs = cfg.vima_bench_kwargs
     seed = kwargs["seed"]
@@ -133,6 +138,8 @@ def main(cfg):
 
     for _ in tqdm(range(30)):
 
+        # seed += 26
+
         verifier_output="failure"
         plan_step=2
         env.seed(seed+2)
@@ -147,6 +154,7 @@ def main(cfg):
         # object_ids = env.obj_ids['fixed']+env.obj_ids['rigid']
         prompt, prompt_assets = env.get_prompt_and_assets()
         print(f"TASK PROMPT :: {prompt}\n")
+
 
         
         obs_rgb_image = env.env.render_camera(task.oracle_cams[0])[0]
@@ -174,6 +182,7 @@ def main(cfg):
             if verifier_output=="failure":
                 shutil.copy(state_2_image_path, state_1_image_path)
                 llm_action_steps = inference_model.infer([state_1_image_path, prompt])
+                print(f"LLM PLAN O/P ACTION STEPS :: {llm_action_steps}\n")
                 plan_step = 2
 
             if len(get_action_steps(llm_action_steps))<2:
@@ -183,7 +192,6 @@ def main(cfg):
                 break
             
             pick_object, place_object = get_pick_place_object(llm_action_steps)
-            print(f"LLM PLAN O/P ACTION STEPS :: {llm_action_steps}\n")
             print(f"\nPICK OBJECT :: {pick_object} \nPLACE OBJECT :: {place_object}\n")
             try:
                 model_action = get_pick_place_coordinates(pick_object, place_object)
@@ -219,10 +227,12 @@ def main(cfg):
             env.env.save_screenshot(task.oracle_cams[0], file_path=state_2_image_path)
             
             verifier_output = verifier_strategy.verify(inference_model, state_1_image_path, state_2_image_path, llm_action_steps, current_step=plan_step).lower().strip()
-            print(f"STATE 1 IMAGE PATH :: {state_1_image_path}")
-            print(f"STATE 2 IMAGE PATH :: {state_2_image_path}")
             print(f"VERIFIER O/P :: {verifier_output}\n")
-            verifier_output = "success" if verifier_output.startswith("success") else "failure"
+            verifier_output = verifier_output.lower().strip()
+            if verifier_output.startswith("success") or verifier_output.startswith("partial"):
+                verifier_output = "success"
+            else:
+                verifier_output = "failure"
             
             # if curr_step<max_perturb_steps:
                 

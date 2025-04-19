@@ -21,7 +21,7 @@ hydra:
 
 inference_model:
   _target_: inference.gemini.GeminiInference
-  model_path: gemini-1.5-flash
+  model_path: gemini-2.0-flash
   plan_strategy:
     _target_: inference.plan.VimaPlan
   verifier_strategy:
@@ -29,4 +29,4 @@ inference_model:
 
 state_1_image_path: /home/hice1/che321/scratch/VLM/vima-perturb-cleaned/images/state_s1_6.png
 state_2_image_path: /home/hice1/che321/scratch/VLM/vima-perturb-cleaned/images/state_s2_6.png
-max_perturb_steps: 0
+max_perturb_steps: 1
