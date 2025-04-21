@@ -28,7 +28,7 @@ class ResultTuple(NamedTuple):
 class SceneUnderstanding(BaseTask):
     """
     Instruction following task:
-    Put the {dragged_texture} object in {image_scene} onto any {base_texture} object
+    Put the {dragged_texture} object in {image_scene} into or onto any {base_texture} object
     """
 
     task_name = "scene_understanding"
@@ -253,7 +253,7 @@ class SceneUnderstanding(BaseTask):
         )
 
         super().__init__(
-            prompt_template="Put the {dragged_texture} object in {scene} onto the {base_texture} object.",
+            prompt_template="Put the {dragged_texture} object in {scene} into or onto the {base_texture} object.",
             task_meta=task_meta,
             placeholder_expression=placeholder_expression,
             oracle_max_steps=oracle_max_steps,

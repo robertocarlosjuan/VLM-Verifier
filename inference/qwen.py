@@ -7,6 +7,7 @@ class QwenInference(BaseInference):
 
     def __init__(self, plan_strategy, verifier_strategy, model_path="Qwen/Qwen2-VL-7B-Instruct"):
 
+        print(f"HF_HOME: {os.environ['HF_HOME']}")
         quantization_config = BitsAndBytesConfig(load_in_4bit=True)
         self.model = Qwen2VLForConditionalGeneration.from_pretrained(
         model_path, torch_dtype="auto", device_map=0, quantization_config=quantization_config)

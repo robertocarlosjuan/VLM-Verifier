@@ -20,12 +20,12 @@ hydra:
   output_subdir: null
 
 inference_model:
-  _target_: inference.gemini.GeminiInference
-  model_path: gemini-2.0-flash
+  _target_: inference.gemini.GeminiInference # inference.qwen.QwenInference
+  model_path: gemini-2.0-flash # Qwen/Qwen2-VL-7B-Instruct
   plan_strategy:
     _target_: inference.plan.VimaPlan
   verifier_strategy:
-    _target_: inference.verifier.BinaryTwoStepVerification    
+    _target_: inference.verifier.TwoStepVerificationFixPerspective #InterleavedImageVerification #TwoStepVerification
 
 state_1_image_path: /home/hice1/che321/scratch/VLM/vima-perturb-cleaned/images/state_s1_6.png
 state_2_image_path: /home/hice1/che321/scratch/VLM/vima-perturb-cleaned/images/state_s2_6.png

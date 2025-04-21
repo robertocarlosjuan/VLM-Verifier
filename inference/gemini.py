@@ -10,7 +10,7 @@ class GeminiInference(BaseInference):
         self.model = genai.GenerativeModel(
             model_name=model_path,
             generation_config = types.GenerationConfig(
-                temperature=0.1
+                temperature=0
             )
         )
         self.plan_strategy = plan_strategy
@@ -27,7 +27,7 @@ class GeminiInference(BaseInference):
             content, 
             request_options={"timeout": 10000}
         )
-        time.sleep(10)
+        time.sleep(3)
         return response.text
 
     def infer(self, *args, **kwargs):
